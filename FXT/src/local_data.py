@@ -7,6 +7,8 @@ import re
 from datetime import datetime
 from collections import namedtuple
 
+Tick = namedtuple("Tick", "datetime buy sell")
+
 class LocalData():
     TFX_DIR = 'TFX_data/'
 
@@ -34,8 +36,6 @@ class LocalData():
         start_date = datetime(self.test_data['start_date'].year, self.test_data['start_date'].month, 1)
         end_date = datetime(self.test_data['end_date'].year, self.test_data['end_date'].month, 1)
         filenames = [db[instrument][k] for k in sorted(db[instrument]) if end_date >= k >= start_date]
-
-        Tick = namedtuple("Tick", "datetime buy sell")
 
         for filename in filenames:
             with zipfile.ZipFile(self.TFX_DIR + filename) as zip_file:

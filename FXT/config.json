@@ -1,6 +1,6 @@
 {
     "use" : {
-        "broker" : "broker_compare",
+        "broker" : "test_broker",
         "model" : "mock_model",
         "log_level" : "DEBUG",
         "log_format" : "%(asctime)s %(name)s: %(message)s"
@@ -14,6 +14,7 @@
         "class" : "src.brokers.test_broker.TestBrokerLocal",
         "account_balance" : 1000,
         "margin_rate" : 0.05,
+        "default_spread" : 0.0002,
         "tick_source": {
             "class" : "src.local_data.LocalData",
             "start_date" : {

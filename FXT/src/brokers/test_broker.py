@@ -5,13 +5,13 @@ import logging
 import importlib
 from datetime import datetime
 
-from src.local_data import LocalData
+from src.local_data import LocalData, Tick
 from src.stat import Stat
 from src.trade import Trade
 from src.driver import Driver
 
 class TestBrokerLocal():
-    def __init__(self, account_balance, margin_rate, tick_source, account_currency="EUR"):
+    def __init__(self, account_balance, margin_rate, tick_source, account_currency="EUR", default_spread=None):
         self.account_id = None
         self.account_name = 'Local test'
         self.account_currency = account_currency
@@ -30,6 +30,8 @@ class TestBrokerLocal():
         self.unrealized_pl = 0
 
         self.tick_source = Driver.init_module_config(tick_source)
+
+        self.default_spread=default_spread
 
         self.stat = Stat(account_balance)
         self.last_tick = {}
@@ -51,6 +53,10 @@ class TestBrokerLocal():
 
     def get_tick_data(self, instrument):
         for tick in self.tick_source.get_tick_data(instrument):
+            # add default spread
+            if self.default_spread:
+                tick = Tick(tick.datetime, tick.buy, tick.buy - self.default_spread)
+
             self.stat.add_tick(tick)
             self.last_tick[instrument] = tick
 
