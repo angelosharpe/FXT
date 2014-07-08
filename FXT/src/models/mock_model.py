@@ -9,7 +9,7 @@ class MockModel(Model):
     """
     Model class
     """
-    def train(self, instrument, train_data):
+    def train(self):
         pass
 
     def trade(self, broker):

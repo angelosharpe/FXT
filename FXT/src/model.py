@@ -15,7 +15,7 @@ class Model(metaclass=ABCMeta):
         self.trades = []
 
     @abstractmethod
-    def train(self, tick_source_config, model_name):
+    def train(self):
         pass
 
     def open_position(self, broker, instrument, volume, order_type='market', expiry=None, **args):
