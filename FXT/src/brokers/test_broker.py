@@ -61,7 +61,7 @@ class TestBrokerLocal():
             self.last_tick[instrument] = tick
 
             # close finished sl/tp trades
-            #self.open_trades_list = self.close_finished_trades(self.open_trades_list)
+            self.open_trades_list = self.close_finished_trades(self.open_trades_list)
 
             yield tick
 
@@ -75,7 +75,7 @@ class TestBrokerLocal():
             trade = Trade(instrument=instrument,
                           volume=volume,
                           open_price=open_price,
-                          open_datetime=self.last_tick[instrument].datetime)
+                          open_datetime=self.last_tick[instrument].datetime, **args)
 
             # calculate margin and convert it to the account currency if needed
             trade_margin = abs(trade.volume) * self.margin_rate
@@ -150,28 +150,28 @@ class TestBrokerLocal():
         """
         left_trades = []
         for trade in trades:
-            if trade.volume > 0:
-                if trade.sl:
-                    if self.last_tick[trade.instrument] <= trade.sl:
-                        self.close(trade)
-                    else:
-                        left_trades.append(trade)
-                if self.tp:
-                    if self.last_tick[trade.instrument] >= trade.tp:
-                        self.close(trade)
-                    else:
-                        left_trades.append(trade)
+            if trade.sl or trade.tp:
+                close = False
+                if trade.volume > 0:
+                    if trade.sl:
+                        if self.last_tick[trade.instrument].sell <= trade.sl:
+                            close = True
+                    if trade.tp:
+                        if self.last_tick[trade.instrument].sell >= trade.tp:
+                            close = True
+                else:
+                    if trade.sl:
+                        if self.last_tick[trade.instrument].buy >= trade.sl:
+                            close = True
+                    if trade.tp:
+                        if self.last_tick[trade.instrument].buy <= trade.tp:
+                            close = True
+                if close:
+                    self.close(trade)
+                else:
+                    left_trades.append(trade)
             else:
-                if trade.sl:
-                    if self.last_tick[trade.instrument] >= trade.sl:
-                        self.close(trade)
-                    else:
-                        left_trades.append(trade)
-                if self.tp:
-                    if self.last_tick[trade.instrument] <= trade.tp:
-                        self.close(trade)
-                    else:
-                        left_trades.append(trade)
+                left_trades.append(trade)
         return left_trades
 
     def get_account(self):
@@ -185,7 +185,7 @@ class TestBrokerLocal():
         None
 
     def get_open_trades(self):
-        return []
+        return self.open_trades_list
 
 class BrokerCompare(TestBrokerLocal):
     def __init__(self, real_broker):

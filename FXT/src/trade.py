@@ -16,6 +16,9 @@ class Trade():
         self.close_datetime = "STILL OPEN"
         self.profit = "STILL OPEN"
         self.args = args
+        self.sl = args['sl'] if 'sl' in args else None
+        self.tp = args['tp'] if 'tp' in args else None
+        self.ts = args['ts'] if 'ts' in args else None
 
     def __str__(self):
         if self.volume < 0:
@@ -27,6 +30,9 @@ class Trade():
         ret += "\tvolume: " + str(abs(self.volume)) + "\n"
         ret += "\topen rate: " + str(self.open_rate) + "\n"
         ret += "\topen datetime: " + str(self.open_datetime) + "\n"
+        ret += "\ttake profit: " + str(self.tp) + "\n"
+        ret += "\tstop loss: " + str(self.sl) + "\n"
+        ret += "\ttrailing stop: " + str(self.sl) + "\n"
         ret += "\tclose rate: " + str(self.close_rate) + "\n"
         ret += "\tclose datetime: " + str(self.close_datetime) + "\n"
         ret += "\tprofit: " + str(self.profit) + "\n"
