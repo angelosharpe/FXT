@@ -23,7 +23,10 @@ class Stat():
 
     def add_trade(self, trade):
         self.trades.append(trade)
+        # add to profit
         self.profit.append((trade.close_datetime, trade.profit))
+        # add to balance
+        self.balance.append((trade.open_datetime, self.final_account_balance))
         self.final_account_balance += trade.profit
         self.balance.append((trade.close_datetime, self.final_account_balance))
 
