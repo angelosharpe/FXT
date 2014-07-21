@@ -12,9 +12,10 @@ Tick = namedtuple("Tick", "datetime buy sell")
 class LocalData():
     TFX_DIR = 'TFX_data/'
 
-    def __init__(self, start_date=None, end_date=None):
+    def __init__(self, start_date=None, end_date=None, default_spread=None):
         self.test_data = {'start_date':datetime(**start_date) if isinstance(start_date, dict) else datetime.now(),
                           'end_date':datetime(**end_date) if isinstance(end_date, dict) else datetime.now()}
+        self.default_spread = default_spread
 
     def _scan_tfx_directory(self):
         database = {}
@@ -32,6 +33,7 @@ class LocalData():
         Read the TFX
         """
         db = self._scan_tfx_directory()
+        pip = 0.0001 if instrument[0] != 'JPY' and instrument[1] != 'JPY' else 0.001 
 
         start_date = datetime(self.test_data['start_date'].year, self.test_data['start_date'].month, 1)
         end_date = datetime(self.test_data['end_date'].year, self.test_data['end_date'].month, 1)
@@ -43,8 +45,11 @@ class LocalData():
                 csv_reader = csv.reader(csv_file, delimiter=',')
                 for row in csv_reader:
                     tick_datetime = datetime.strptime(row[1], '%Y%m%d %H:%M:%S.%f')
-                    if self.test_data['start_date'] <= tick_datetime < self.test_data['end_date'] :
-                        yield Tick(tick_datetime, float(row[3]), float(row[2]))
+                    if self.test_data['start_date'] <= tick_datetime < self.test_data['end_date']:
+                        if self.default_spread:
+                            yield Tick(tick_datetime, float(row[3]), (float(row[3])-pip*self.default_spread))
+                        else:
+                            yield Tick(tick_datetime, float(row[3]), float(row[2]))
                     elif tick_datetime >= self.test_data['end_date']:
                         break
 
