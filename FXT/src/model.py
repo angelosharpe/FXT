@@ -26,7 +26,7 @@ class Model(metaclass=ABCMeta):
 
     def close_position(self, broker, trade):
         ret = broker.close(trade)
-        if trade:
+        if trade in self.trades:
             self.trades.remove(trade)
         return ret
 
