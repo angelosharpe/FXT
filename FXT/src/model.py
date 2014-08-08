@@ -26,8 +26,13 @@ class Model(metaclass=ABCMeta):
 
     def close_position(self, broker, trade):
         ret = broker.close(trade)
-        if trade in self.trades:
-            self.trades.remove(trade)
+        if ret is not None:
+            for t in self.trades:
+                if t.id == trade.id:
+                    self.trades.remove(t)
+                break
+        else:
+            print("not closed!!")
         return ret
 
     @abstractmethod

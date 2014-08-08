@@ -3,6 +3,7 @@
 
 import logging
 import importlib
+import copy
 from datetime import datetime
 
 from src.local_data import LocalData, Tick
@@ -12,29 +13,38 @@ from src.driver import Driver
 
 class TestBrokerLocal():
     def __init__(self, account_balance, margin_rate, tick_source, account_currency="EUR"):
+        self.param_account_balance = account_balance
+        self.param_margin_rate = margin_rate
+        self.param_tick_source = tick_source
+        self.param_account_currency = account_currency
+
+        self.reset_broker()
+
+        self.logger = logging.getLogger(__name__)
+
+    def reset_broker(self):
         self.account_id = None
         self.account_name = 'Local test'
-        self.account_currency = account_currency
-        self.margin_rate = margin_rate
+        self.account_currency = self.param_account_currency
+        self.margin_rate = self.param_margin_rate
 
-        self.balance = account_balance
-        self.margin_available = account_balance
+        self.balance = self.param_account_balance
+        self.margin_available = self.param_account_balance
         self.margin_used = 0.0
 
         self.open_orders = 0
         self.open_orders_list = []
         self.open_trades = 0
         self.open_trades_list = []
+        self.trade_id = 0
 
         self.realized_pl = 0
         self.unrealized_pl = 0
 
-        self.tick_source = Driver.init_module_config(tick_source)
+        self.tick_source = Driver.init_module_config(self.param_tick_source)
 
-        self.stat = Stat(account_balance)
+        self.stat = Stat(self.param_account_balance)
         self.last_tick = {}
-
-        self.logger = logging.getLogger(__name__)
 
     def __str__(self):
         ret = "Local test broker"
@@ -69,7 +79,8 @@ class TestBrokerLocal():
             trade = Trade(instrument=instrument,
                           volume=volume,
                           open_price=open_price,
-                          open_datetime=self.last_tick[instrument].datetime, **args)
+                          open_datetime=self.last_tick[instrument].datetime, 
+                          id=self.trade_id, **args)
 
             # calculate margin and convert it to the account currency if needed
             trade_margin = abs(trade.volume) * self.margin_rate
@@ -83,6 +94,7 @@ class TestBrokerLocal():
                 self.margin_used += trade_margin_converted
                 self.open_trades += 1
                 self.open_trades_list.append(trade)
+                self.trade_id += 1
                 return trade
         else:
             self.logger.warning("oreder_type is not 'market' - not implemented yet")
@@ -93,6 +105,12 @@ class TestBrokerLocal():
             close_price = self.last_tick[trade.instrument].sell
         elif trade.volume < 0:
             close_price = self.last_tick[trade.instrument].buy
+
+        if trade in self.open_trades_list:
+            self.open_trades_list.remove(trade)
+        else:
+            print(trade.id, "not in trade list!!")
+            return None
 
         trade.close(close_price, self.last_tick[trade.instrument].datetime)
 
@@ -184,7 +202,7 @@ class TestBrokerLocal():
         None
 
     def get_open_trades(self):
-        return self.open_trades_list
+        return copy.deepcopy(self.open_trades_list)
 
 class BrokerCompare(TestBrokerLocal):
     def __init__(self, real_broker):
