@@ -26,16 +26,17 @@ class Trade():
         else:
             side = "buy"
         ret = "TRADE: " + side + " " + self.instrument[0] + "/" + self.instrument[1] + "\n"
-        ret += "\tID: " + str(self.id) + "\n"
-        ret += "\tvolume: " + str(abs(self.volume)) + "\n"
-        ret += "\topen rate: " + str(self.open_rate) + "\n"
-        ret += "\topen datetime: " + str(self.open_datetime) + "\n"
-        ret += "\ttake profit: " + str(self.tp) + "\n"
-        ret += "\tstop loss: " + str(self.sl) + "\n"
-        ret += "\ttrailing stop: " + str(self.sl) + "\n"
-        ret += "\tclose rate: " + str(self.close_rate) + "\n"
-        ret += "\tclose datetime: " + str(self.close_datetime) + "\n"
-        ret += "\tprofit: " + str(self.profit) + "\n"
+        ret += "\tprofit:\t" + str(self.profit) + "\n"
+        ret += "\topen rate:\t" + str(self.open_rate) + "\n"
+        ret += "\tclose rate:\t" + str(self.close_rate) + "\n"
+        ret += "\trate diff:\t%0.5f" % (self.close_rate - self.open_rate) + "\n"
+        ret += "\topen datetime:\t" + str(self.open_datetime) + "\n"
+        ret += "\tclose datetime:\t" + str(self.close_datetime) + "\n"
+        ret += "\tvolume:\t\t" + str(abs(self.volume)) + "\n"
+        ret += "\ttake profit:\t" + str(self.tp) + "\n"
+        ret += "\tstop loss:\t" + str(self.sl) + "\n"
+        ret += "\ttrailing stop:\t" + str(self.sl) + "\n"
+        ret += "\tID:\t\t" + str(self.id) + "\n"
         return ret
 
     def close(self, close_price, close_datetime):

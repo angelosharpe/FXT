@@ -35,8 +35,34 @@ class Model(metaclass=ABCMeta):
             print("not closed!!")
         return ret
 
-    @abstractmethod
     def trade(self, broker):
+        # store broker
+        self.broker = broker
+        
+        # actualize open trades
+        self.trades = broker.get_open_trades()
+        
+        # run pre-trade loop method
+        self.pre_trade_loop()
+        
+        # exec trade loop
+        for tick in broker.get_tick_data(self.instrument):
+            self.buffer.append(tick)
+            self.trade_loop(tick)
+        
+        # run post-trade loop method
+        self.post_trade_loop()
+
+    @abstractmethod
+    def pre_trade_loop(self):
+        pass
+
+    @abstractmethod
+    def post_trade_loop(self):
+        pass
+
+    @abstractmethod
+    def trade_loop(self, tick):
         pass
 
     def start(self, broker):

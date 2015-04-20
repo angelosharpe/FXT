@@ -1,8 +1,8 @@
 {
     "use" : {
-        "broker" : "test_broker",
-        "model" : "mock_model",
-        "log_level" : "DEBUG",
+        "broker" : "test_broker_local",
+        "model" : "random_model",
+        "log_level" : "NOTSET",
         "log_format" : "%(asctime)s %(name)s: %(message)s"
     },
     "mock_model" : {
@@ -10,19 +10,62 @@
         "instrument" : ["EUR","USD"],
         "pricebuffer_size" : 1000
     },
-    "test_broker" : {
-        "class" : "src.brokers.test_broker.TestBrokerLocal",
-        "account_balance" : 1000,
-        "margin_rate" : 0.05,
-        "default_spread" : 0.0002,
-        "tick_source": {
+    "random_model" : {
+        "class" : "src.models.random_model.RandomModel",
+        "instrument" : ["EUR","USD"],
+        "pricebuffer_size" : 1000,
+        "tick_source" : {
             "class" : "src.local_data.LocalData",
             "start_date" : {
                 "year" : 2014,
-                "month" : 4,
+                "month" : 5,
                 "day" : 1
             },
-            "end_date" : ""
+            "end_date" : {
+                "year" : 2014,
+                "month" : 5,
+                "day" : 3
+            },
+            "default_spread" : 1.2
+        }
+    },
+    "toms_first_model" : {
+        "class" : "src.models.toms_models.FirstModel",
+        "instrument" : ["EUR","USD"],
+        "pricebuffer_size" : 5000,
+        "mode" : "train",
+        "tick_source" : {
+            "class" : "src.local_data.LocalData",
+            "start_date" : {
+                "year" : 2014,
+                "month" : 5,
+                "day" : 1
+            },
+            "end_date" : {
+                "year" : 2014,
+                "month" : 5,
+                "day" : 3
+            },
+            "default_spread" : 1.2
+        }
+    },
+    "test_broker_local" : {
+        "class" : "src.brokers.test_broker.TestBrokerLocal",
+        "account_balance" : 1000,
+        "margin_rate" : 0.05,
+        "tick_source": {
+            "class" : "src.local_data.LocalData",
+            "default_spread" : 1.2,
+            "start_date" : {
+                "year" : 2014,
+                "month" : 6,
+                "day" : 1
+            },
+            "end_date" : {
+                "year" : 2014,
+                "month" : 6,
+                "day" : 5
+            }
         }
     },
     "test_broker_real" : {
