@@ -9,19 +9,19 @@ from src.model import Model
 class RandomModel(Model):
     """
     Model class
-    """
-    def __init__(self, *args, **kwargs):
-        super(RandomModel, self).__init__(*args, **kwargs)
-        self.last_trade_datetime = None
-        self.trade_now = False
-    
+    """    
     def train(self):
         pass
 
     def pre_trade_loop(self):
-        pass
+        self.last_trade_datetime = None
+        self.trade_now = False
 
     def post_trade_loop(self):
+        # is there some open trade? If so close it
+        for trade in self.trades:
+            ret = self.close_position(self.broker, trade)
+            print(ret)
         print(self.broker.stat)
         self.broker.stat.plot(show_trades='all', what=['balance'])
 
