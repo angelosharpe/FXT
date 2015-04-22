@@ -4,15 +4,20 @@
 from abc import ABCMeta, abstractmethod
 
 from src.pricebuffer import PriceBuffer
+from src.driver import Driver
 
 class Model(metaclass=ABCMeta):
-    def __init__(self, instrument, mode='all', pricebuffer_size=1000, **params):
+    def __init__(self, instrument, mode='all', pricebuffer_size=1000, tick_source=None, **params):
         self.buffer = PriceBuffer(size=pricebuffer_size)
         self.instrument = tuple(instrument)
         self.mode = mode
         self.params = params
 
         self.trades = []
+        if tick_source:
+            self.tick_source = Driver.init_module_config(tick_source)
+        else:
+            self.tick_source = None
 
     @abstractmethod
     def train(self):
